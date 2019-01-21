@@ -9,8 +9,14 @@ Serial myPort;              // The serial port
 int radioID;
 int sensorValue;
 int sqSize = 700; // Largest square is the size of the window
-int[] sradios = {1,2,4,5,6,7,8,10,12,15}; // array to hold radios that are transmitting to controller
-int[] svalues = {0,255,0,255,0,255,0,255,0,255}; // array to hold sensor values - constantly updated
+int[] sradios = {1,2,4,5,6,7,8,10,12,15,9}; // array to hold radios that are transmitting to controller
+int[] svalues = {0,255,0,255,0,255,0,255,0,255,0}; // array to hold sensor values - constantly updated
+                                                 // NOTE: sradios.length must == svalues.length @tyson
+                                         
+// HSB Modifiers
+int satVal = abs(255/4 * 3); // value for saturation, (any value, 255 max) @tyson 
+int hueVal = 30; // hue seperation per radio (any value, 255 range)
+int hueStart = 100; // hue offset (any value, 255 range)
 
 void setup() {
   size(700, 700);
@@ -32,27 +38,22 @@ void setup() {
 void draw() {
   background(255);
   int coord = sqSize/2; // a variable to center the squares in canvas @maria
+  
   // Loop through the radios & sensor value arrays to create a square for each radio @maria
-  for(int i = 0; i < sradios.length; i++){
-    int rid = sradios[i]; // The radio ID
-    // Get the corresponding sensor value
-    int sval = svalues[i]; // The sensor value
+  for(int i = 0; i < sradios.length; i++) {
     
-    // Map the sensor values to range 0 - 255 for RGB color mode. 
-    // Map function - val to map, min, max, min val to map to, max val to map to
-    float cVal = map(sval,0,1023,0,255); // the new color value
-    //color sqCol = color(cVal,cVal,cVal);// Color the squares
-    color sqCol = color(cVal,cVal/2,cVal/3);// Color the squares
+    colorMode(HSB,255,255,255); // switch to HSB colors @tyson
+    float cVal = svalues[i]; // the new balance value
+    color sqCol = color((hueStart + hueVal * i) % 255,satVal % 255,cVal);// Color the squares
+                                                // % aka modulo guarantees values will be valid
     
     // Draw the squares at the specified coordinate, using sqSize to control size @maria
     rectMode(CENTER);
     noStroke();
     fill(sqCol);
-    int newSize = sqSize - (70 * i); // Generate a smaller size for the next square @maria
+    int newSize = sqSize - ((sqSize/sradios.length) * i); // Generate a smaller size for the next square @maria
+                                                          // Adjusted to adapt to sradios array size @tyson
     rect(coord,coord,newSize,newSize);
-    
-    
-    
     
     // Draw the labels at the square's center @maria
     /*
@@ -68,7 +69,7 @@ void serialEvent(Serial myPort) {
   if (myString != null) {
     println(myString);
     myString = trim(myString);
-
+    
     // split the string at the commas
     // and convert the sections into integers:
     int sensors[] = int(split(myString, ','));
@@ -86,28 +87,15 @@ void serialEvent(Serial myPort) {
  */
 void updateData(int rID, int sVal){
   // println("Radio Id: " + rID + " Sensor Value: " + sVal);
-  if(rID == 1){
-    svalues[0] = sVal;
-  } else if(rID == 2){
-    svalues[1] = sVal;
-  } else if(rID == 4){
-    svalues[2] = sVal;
-  } else if(rID == 5){
-    svalues[3] = sVal;
-  } else if(rID == 6){
-    svalues[4] = sVal;
-  } else if(rID == 7){
-    svalues[5] = sVal;
-  } else if(rID == 8){
-    svalues[6] = sVal;
-  } else if(rID == 10){
-    svalues[7] = sVal;
-  } else if(rID == 12){
-    svalues[8] = sVal;
-  } else if(rID == 15){
-    svalues[9] = sVal;
-  } else {
-    println("Sensor value not updated! Check the radio ID ");
+  
+  for (int i =0; i<sradios.length;i++) { // Loop through all radios @tyson
+    if (rID == sradios[i]) { // if target radio id matches current radio index... @tyson
+      svalues[i] = sVal;  // set a new value for this radio index @tyson
+      return; // exit this function @tyson
+    }
   }
-  // TODO: Add Alicia's Radio
+  
+  // This will only occur if rID was not found! @tyson
+  println("Sensor value not updated! Check the radio ID ");
+  
 }

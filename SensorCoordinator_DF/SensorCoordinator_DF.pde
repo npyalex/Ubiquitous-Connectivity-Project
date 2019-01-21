@@ -11,15 +11,15 @@ Serial myPort;              // The serial port
 int radioID;
 int sensorValue;
 int sqSize = 700; // Largest square is the size of the window
-int[] sradios = {1,2,4,5,6,7,8,10,12,15}; // array to hold radios that are transmitting to controller
-int[] svalues = {255,255,255,255,255,255,255,255,255,255}; // [DF LOUNGE ROOMS] array to hold sensor values - constantly updated
+int[] sradios = {1,2,4,5,6,7,8,10,12,15,9}; // array to hold radios that are transmitting to controller
+int[] svalues = {255,255,255,255,255,255,255,255,255,255,255}; // [DF LOUNGE ROOMS] array to hold sensor values - constantly updated
 
 // DF Grad Student Lounge Rooms
 int[] xRooms = {958,1023,841,706,706,609,411,132,550,127,841}; // x coords for floor plan
 int[] yRooms = {381,223,165,166,346,166,169,465,389,236,381}; // y coords for floor plan
 int[] wRooms = {172,108,182,135,135,97,198,418,151,284,118}; // width for floor plan
 int[] hRooms = {229,158,217,173,263,217,296,145,220,227,229}; // height for floor plan
-int[] lRooms = {1,2,3,4,5,6,7,8,9,10,11}; // labels for floor plan
+String[] lRooms = {"Open Tables","Common \nArea","Equipment Cabinet \n& Working Space","Lockers","2nd Yr Tables","Kitchen","Open Tables \n& 2nd Yr Tables","Interactive Futures Lab","Ambient \nExperience Lab","Social Body Lab","2nd Yr Tables"}; // labels for floor plan
 
 void setup() {
   size(1280, 800);
@@ -52,17 +52,9 @@ void draw() {
     int rH = hRooms[i]; // height
     int sval;
     
-    if(i == 10){
-      // Not enough radios
-      sval = svalues[0]; // One radio will control two spaces
-    } else {
-      sval = svalues[i]; // Get the corresponding sensor value
-    }
-    
-    // Map the sensor values to range 0 - 255 for RGB color mode. 
-    // Map function - val to map, min, max, min val to map to, max val to map to
-    float cVal = map(sval,0,1023,0,255); // the new color value
-    color sqCol = color(cVal,cVal,cVal);// Color the squares - Black & White
+    sval = svalues[i]; // Get the corresponding sensor value
+
+    color sqCol = color(sval,sval,sval);// Color the squares - Black & White
     
     fill(sqCol);
     rect(rX,rY,rW,rH);
@@ -74,12 +66,16 @@ void draw() {
     int rY = yRooms[i]; // y-coords
     int rW = wRooms[i]; // width
     int rH = hRooms[i]; // height
-    int rL = lRooms[i]; // label
+    String rL = lRooms[i]; // label
     
     textAlign(CENTER,CENTER);
     fill(0);
+    textSize(14);
     text(rL, rX+(rW/2) , rY+(rH/2)); // calc a new x,y pos to center the labels in the squares
   }
+  
+  textSize(24);
+  text("Digital Futures 205 Richmond Studio Floor Plan",width/2,100);
 }
 
 void serialEvent(Serial myPort) {
@@ -106,28 +102,15 @@ void serialEvent(Serial myPort) {
  */
 void updateData(int rID, int sVal){
   // println("Radio Id: " + rID + " Sensor Value: " + sVal);
-  if(rID == 1){
-    svalues[0] = sVal;
-  } else if(rID == 2){
-    svalues[1] = sVal;
-  } else if(rID == 4){
-    svalues[2] = sVal;
-  } else if(rID == 5){
-    svalues[3] = sVal;
-  } else if(rID == 6){
-    svalues[4] = sVal;
-  } else if(rID == 7){
-    svalues[5] = sVal;
-  } else if(rID == 8){
-    svalues[6] = sVal;
-  } else if(rID == 10){
-    svalues[7] = sVal;
-  } else if(rID == 12){
-    svalues[8] = sVal;
-  } else if(rID == 15){
-    svalues[9] = sVal;
-  } else {
-    println("Sensor value not updated! Check the radio ID ");
+    // println("Radio Id: " + rID + " Sensor Value: " + sVal);
+  
+  for (int i =0; i<sradios.length;i++) { // Loop through all radios @tyson
+    if (rID == sradios[i]) { // if target radio id matches current radio index... @tyson
+      svalues[i] = sVal;  // set a new value for this radio index @tyson
+      return; // exit this function @tyson
+    }
   }
-  // TODO: Add Alicia's Radio
+  
+  // This will only occur if rID was not found! @tyson
+  println("Sensor value not updated! Check the radio ID ");
 }

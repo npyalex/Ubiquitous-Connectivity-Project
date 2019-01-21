@@ -9,3 +9,8 @@
     Modified the code to generate squares that fill the screen and
     are centered in the middle of the sketch, sized in a gradated 
     manner - @maria
+
+###### Incorporated Tyson's color code & consolidated all code
+    Final update from Monday's testing session. Cleaned up code,
+    removed map function in processing to work with Nick's calibration
+    code in Arduino. 
