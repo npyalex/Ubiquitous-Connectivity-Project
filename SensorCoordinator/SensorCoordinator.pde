@@ -9,6 +9,7 @@ Serial myPort;              // The serial port
 int radioID;
 int sensorValue;
 int sqSize = 700; // Largest square is the size of the window
+
 int[] sradios = {1,2,4,5,6,7,8,10,12,15,9}; // array to hold radios that are transmitting to controller
 int[] svalues = {0,255,0,255,0,255,0,255,0,255,0}; // array to hold sensor values - constantly updated
                                                  // NOTE: sradios.length must == svalues.length @tyson
@@ -25,7 +26,7 @@ void setup() {
 
   // Change the 0 to the appropriate number of the serial port
   // that your microcontroller is attached to.
-  String portName = Serial.list()[32];
+  String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   // read incoming bytes to a buffer
   // until you get a linefeed (ASCII 10):
@@ -41,7 +42,6 @@ void draw() {
   
   // Loop through the radios & sensor value arrays to create a square for each radio @maria
   for(int i = 0; i < sradios.length; i++) {
-    
     colorMode(HSB,255,255,255); // switch to HSB colors @tyson
     float cVal = svalues[i]; // the new balance value
     color sqCol = color((hueStart + hueVal * i) % 255,satVal % 255,cVal);// Color the squares
