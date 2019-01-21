@@ -11,9 +11,10 @@ int sensorValue;
 int sqSize = 700; // Largest square is the size of the window
 int[] sradios = {1,2,4,5,6,7,8,10,12,15}; // array to hold radios that are transmitting to controller
 int[] svalues = {0,255,0,255,0,255,0,255,0,255}; // array to hold sensor values - constantly updated
+                                                 // NOTE: sradios.length must == svalues.length @tyson
 
 void setup() {
-  size(700, 700);
+  size(sqSize, sqSize);
   // List all the available serial ports in the console
   // printArray(Serial.list()); // uncomment this to view your port Amaria
 
@@ -35,12 +36,10 @@ void draw() {
   
   // Loop through the radios & sensor value arrays to create a square for each radio @maria
   for(int i = 0; i < sradios.length; i++) {
-    int rid = sradios[i]; // The current radio ID
-    int sval = svalues[i]; // The current sensor value
     
     // Map the sensor values to range 0 - 255 for RGB color mode. 
     // Map function - val to map, min, max, min val to map to, max val to map to
-    float cVal = map(sval,0,1023,0,255); // the new color value
+    float cVal = map(svalues[i],0,1023,0,255); // the new color value
     //color sqCol = color(cVal,cVal,cVal);// Color the squares
     color sqCol = color(cVal,cVal/2,cVal/3);// Color the squares
     
@@ -48,7 +47,8 @@ void draw() {
     rectMode(CENTER);
     noStroke();
     fill(sqCol);
-    int newSize = sqSize - (70 * i); // Generate a smaller size for the next square @maria
+    int newSize = sqSize - ((sqSize/sradios.length) * i); // Generate a smaller size for the next square @maria
+                                                          // Adjusted to adapt to sradios array size @tyson
     rect(coord,coord,newSize,newSize);
     
     // Draw the labels at the square's center @maria
@@ -84,18 +84,18 @@ void serialEvent(Serial myPort) {
 void updateData(int rID, int sVal){
   // println("Radio Id: " + rID + " Sensor Value: " + sVal);
   
-  for (int i =0; i<sradios.length;i++) { // Loop through all radios
-    if (rID == sradios[i]) { // if target radio id matches current radio index...
-      svalues[i] = sVal;  // set a new value for this radio index
-      return; // exit this function
+  for (int i =0; i<sradios.length;i++) { // Loop through all radios @tyson
+    if (rID == sradios[i]) { // if target radio id matches current radio index... @tyson
+      svalues[i] = sVal;  // set a new value for this radio index @tyson
+      return; // exit this function @tyson
     }
   }
   
-  // This will only occur if rID was not found!
+  // This will only occur if rID was not found! @tyson
   println("Sensor value not updated! Check the radio ID ");
   
   /*
-  if(rID == 1){
+  if(rID == 1){ // @maria
     svalues[0] = sVal;
   } else if(rID == 2){
     svalues[1] = sVal;
