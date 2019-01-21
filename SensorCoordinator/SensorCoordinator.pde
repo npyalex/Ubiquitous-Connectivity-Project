@@ -9,8 +9,9 @@ Serial myPort;              // The serial port
 int radioID;
 int sensorValue;
 int sqSize = 700; // Largest square is the size of the window
-int[] sradios = {1,2,4,5,6,7,8,10,12,15}; // array to hold radios that are transmitting to controller
-int[] svalues = {0,255,0,255,0,255,0,255,0,255}; // array to hold sensor values - constantly updated
+
+int[] sradios = {1,2,4,5,6,7,8,10,12,15,9}; // array to hold radios that are transmitting to controller
+int[] svalues = {0,255,0,255,0,255,0,255,0,255,0}; // array to hold sensor values - constantly updated
                                                  // NOTE: sradios.length must == svalues.length @tyson
                                          
 // HSB Modifiers
@@ -41,21 +42,10 @@ void draw() {
   
   // Loop through the radios & sensor value arrays to create a square for each radio @maria
   for(int i = 0; i < sradios.length; i++) {
-    
-    
     colorMode(HSB,255,255,255); // switch to HSB colors @tyson
-    float cVal = map(svalues[i],0,1023,0,255); // the new balance value
-    //color sqCol = color(cVal,cVal,cVal);// Color the squares
+    float cVal = svalues[i]; // the new balance value
     color sqCol = color((hueStart + hueVal * i) % 255,satVal % 255,cVal);// Color the squares
                                                 // % aka modulo guarantees values will be valid
-    
-    /*
-    // Map the sensor values to range 0 - 255 for RGB color mode. 
-    // Map function - val to map, min, max, min val to map to, max val to map to
-    float cVal = map(svalues[i],0,1023,0,255); // the new color value
-    //color sqCol = color(cVal,cVal,cVal);// Color the squares
-    color sqCol = color(cVal,cVal/2,cVal/3);// Color the squares
-    */
     
     // Draw the squares at the specified coordinate, using sqSize to control size @maria
     rectMode(CENTER);
@@ -108,30 +98,4 @@ void updateData(int rID, int sVal){
   // This will only occur if rID was not found! @tyson
   println("Sensor value not updated! Check the radio ID ");
   
-  /*
-  if(rID == 1){ // @maria
-    svalues[0] = sVal;
-  } else if(rID == 2){
-    svalues[1] = sVal;
-  } else if(rID == 4){
-    svalues[2] = sVal;
-  } else if(rID == 5){
-    svalues[3] = sVal;
-  } else if(rID == 6){
-    svalues[4] = sVal;
-  } else if(rID == 7){
-    svalues[5] = sVal;
-  } else if(rID == 8){
-    svalues[6] = sVal;
-  } else if(rID == 10){
-    svalues[7] = sVal;
-  } else if(rID == 12){
-    svalues[8] = sVal;
-  } else if(rID == 15){
-    svalues[9] = sVal;
-  } else {
-    println("Sensor value not updated! Check the radio ID ");
-  }
-  // TODO: Add Alicia's Radio
-  */
 }
