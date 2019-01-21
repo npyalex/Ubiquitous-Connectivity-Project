@@ -12,9 +12,14 @@ int sqSize = 700; // Largest square is the size of the window
 int[] sradios = {1,2,4,5,6,7,8,10,12,15}; // array to hold radios that are transmitting to controller
 int[] svalues = {0,255,0,255,0,255,0,255,0,255}; // array to hold sensor values - constantly updated
                                                  // NOTE: sradios.length must == svalues.length @tyson
+                                         
+// HSB Modifiers
+int satVal = abs(255/4 * 3); // value for saturation, (any value, 255 max) @tyson 
+int hueVal = 30; // hue seperation per radio (any value, 255 range)
+int hueStart = 100; // hue offset (any value, 255 range)
 
 void setup() {
-  size(sqSize, sqSize);
+  size(700, 700);
   // List all the available serial ports in the console
   // printArray(Serial.list()); // uncomment this to view your port Amaria
 
@@ -37,11 +42,20 @@ void draw() {
   // Loop through the radios & sensor value arrays to create a square for each radio @maria
   for(int i = 0; i < sradios.length; i++) {
     
+    
+    colorMode(HSB,255,255,255); // switch to HSB colors @tyson
+    float cVal = map(svalues[i],0,1023,0,255); // the new balance value
+    //color sqCol = color(cVal,cVal,cVal);// Color the squares
+    color sqCol = color((hueStart + hueVal * i) % 255,satVal % 255,cVal);// Color the squares
+                                                // % aka modulo guarantees values will be valid
+    
+    /*
     // Map the sensor values to range 0 - 255 for RGB color mode. 
     // Map function - val to map, min, max, min val to map to, max val to map to
     float cVal = map(svalues[i],0,1023,0,255); // the new color value
     //color sqCol = color(cVal,cVal,cVal);// Color the squares
     color sqCol = color(cVal,cVal/2,cVal/3);// Color the squares
+    */
     
     // Draw the squares at the specified coordinate, using sqSize to control size @maria
     rectMode(CENTER);
