@@ -26,6 +26,13 @@ void loop() {
   int pinValue = analogRead(sensorPin); 
   //map the data so it can be turned into a colour by Processing:
   int sensorValue = map(pinValue, sensorMin, sensorMax, 0, 255); 
+    if(sensorValue > 255){
+      sensorValue = 255;
+    } 
+    if(sensorValue < 0){
+      sensorValue = 0;
+    }
+    
   Serial1.print(radioID);
   Serial.print(radioID);
   Serial1.print(",");
