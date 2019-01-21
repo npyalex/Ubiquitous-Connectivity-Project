@@ -8,11 +8,12 @@ import processing.serial.*; // import the Processing serial library
 Serial myPort;              // The serial port
 int radioID;
 int sensorValue;
+int sqSize = 700; // Largest square is the size of the window
 int[] sradios = {1,2,4,5,6,7,8,10,12,15}; // array to hold radios that are transmitting to controller
-int[] svalues = {50,50,50,50,50,50,50,50,50,50}; // array to hold sensor values - constantly updated
+int[] svalues = {0,255,0,255,0,255,0,255,0,255}; // array to hold sensor values - constantly updated
 
 void setup() {
-  size(800, 800);
+  size(700, 700);
   // List all the available serial ports in the console
   // printArray(Serial.list()); // uncomment this to view your port Amaria
 
@@ -25,27 +26,39 @@ void setup() {
   myPort.bufferUntil('\n');
 }
 
-
+/*
+ *  This function draws a 
+ */
 void draw() {
   background(255);
-  int coord = 50; // a variable to increment the next ellipses position onscreen @maria
-  
-  // Loop through the radios & sensor value arrays to create an ellipse for each radio @maria
+  int coord = sqSize/2; // a variable to center the squares in canvas @maria
+  // Loop through the radios & sensor value arrays to create a square for each radio @maria
   for(int i = 0; i < sradios.length; i++){
     int rid = sradios[i]; // The radio ID
     // Get the corresponding sensor value
     int sval = svalues[i]; // The sensor value
     
-    // Draw the ellipses at the specified coordinate, using sval to control size @maria
-    ellipseMode(CENTER);
-    fill(255);
-    ellipse(coord,coord,sval,sval);
+    // Map the sensor values to range 0 - 255 for RGB color mode. 
+    // Map function - val to map, min, max, min val to map to, max val to map to
+    float cVal = map(sval,0,1023,0,255); // the new color value
+    //color sqCol = color(cVal,cVal,cVal);// Color the squares
+    color sqCol = color(cVal,cVal/2,cVal/3);// Color the squares
     
-    // Draw the labels at the ellipse center @maria
+    // Draw the squares at the specified coordinate, using sqSize to control size @maria
+    rectMode(CENTER);
+    noStroke();
+    fill(sqCol);
+    int newSize = sqSize - (70 * i); // Generate a smaller size for the next square @maria
+    rect(coord,coord,newSize,newSize);
+    
+    
+    
+    
+    // Draw the labels at the square's center @maria
+    /*
     textAlign(CENTER,CENTER);
     fill(0);
-    text(rid, coord, coord); 
-    coord += 60;
+    text(rid, coord, coord); */
   }
 }
 
