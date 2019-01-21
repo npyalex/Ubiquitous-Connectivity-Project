@@ -19,7 +19,7 @@ void setup() {
 
   // Change the 0 to the appropriate number of the serial port
   // that your microcontroller is attached to.
-  String portName = Serial.list()[32];
+  String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   // read incoming bytes to a buffer
   // until you get a linefeed (ASCII 10):
@@ -32,11 +32,11 @@ void setup() {
 void draw() {
   background(255);
   int coord = sqSize/2; // a variable to center the squares in canvas @maria
+  
   // Loop through the radios & sensor value arrays to create a square for each radio @maria
-  for(int i = 0; i < sradios.length; i++){
-    int rid = sradios[i]; // The radio ID
-    // Get the corresponding sensor value
-    int sval = svalues[i]; // The sensor value
+  for(int i = 0; i < sradios.length; i++) {
+    int rid = sradios[i]; // The current radio ID
+    int sval = svalues[i]; // The current sensor value
     
     // Map the sensor values to range 0 - 255 for RGB color mode. 
     // Map function - val to map, min, max, min val to map to, max val to map to
@@ -50,9 +50,6 @@ void draw() {
     fill(sqCol);
     int newSize = sqSize - (70 * i); // Generate a smaller size for the next square @maria
     rect(coord,coord,newSize,newSize);
-    
-    
-    
     
     // Draw the labels at the square's center @maria
     /*
@@ -68,7 +65,7 @@ void serialEvent(Serial myPort) {
   if (myString != null) {
     println(myString);
     myString = trim(myString);
-
+    
     // split the string at the commas
     // and convert the sections into integers:
     int sensors[] = int(split(myString, ','));
@@ -86,6 +83,18 @@ void serialEvent(Serial myPort) {
  */
 void updateData(int rID, int sVal){
   // println("Radio Id: " + rID + " Sensor Value: " + sVal);
+  
+  for (int i =0; i<sradios.length;i++) { // Loop through all radios
+    if (rID == sradios[i]) { // if target radio id matches current radio index...
+      svalues[i] = sVal;  // set a new value for this radio index
+      return; // exit this function
+    }
+  }
+  
+  // This will only occur if rID was not found!
+  println("Sensor value not updated! Check the radio ID ");
+  
+  /*
   if(rID == 1){
     svalues[0] = sVal;
   } else if(rID == 2){
@@ -110,4 +119,5 @@ void updateData(int rID, int sVal){
     println("Sensor value not updated! Check the radio ID ");
   }
   // TODO: Add Alicia's Radio
+  */
 }
